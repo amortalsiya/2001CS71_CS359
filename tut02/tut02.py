@@ -2,7 +2,7 @@ from scapy.all import *
 
 dst_ip = "104.23.141.25"# OMEGLE.COM
 dst_port = 443
-src_port = 4439
+src_port = 9999
 
 syn_pkt = IP(dst=dst_ip) / TCP(dport=dst_port, flags="S")
 syn_ack_pkt = sr1(syn_pkt)
