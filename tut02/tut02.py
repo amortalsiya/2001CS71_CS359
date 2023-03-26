@@ -1,4 +1,4 @@
-from scapy.all import*
+from scapy.all import *
 
 dst_ip = "104.23.141.25"
 dst_port = 443
@@ -67,12 +67,13 @@ arp_response = srp1(arp_send)
 wrpcap("./output/ARP_request_response_2001CS71.pcap", [arp_send, arp_response])
 
 
-ftp_pkt = IP(dst='23.185.0.3')/TCP(sport=20, dport=21, flags="S")#goanywhere_PFT=23.185.0.3
+ftp_pkt = IP(dst='23.185.0.3')/TCP(sport=20, dport=21,
+                                   flags="S")  # goanywhere_PFT=23.185.0.3
 ftp_res = sr1(ftp_pkt)
 
 wrpcap("./output/FTP_Connection_Start_2001CS71.pcap", [ftp_pkt, ftp_res])
 
 ftp_close = IP(dst='23.185.0.3')/TCP(sport=20, dport=21, seq=ftp_res.ack,
-                                          ack=ftp_res.seq+1, flags="PA")
+                                     ack=ftp_res.seq+1, flags="PA")
 
 wrpcap("./output/FTP_Connection_End_2001CS71.pcap", [ftp_close])
