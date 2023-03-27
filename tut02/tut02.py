@@ -45,7 +45,7 @@ wrpcap("./output/TCP_handshake_close_2001CS71.pcap",
 
 #DNS REQUEST
 dns_query = IP(dst="8.8.8.8")/UDP(sport=RandShort(), dport=53) / \
-    DNS(rd=1, qd=DNSQR(qname="investing.com", qtype="A"))
+    DNS(rd=1, qd=DNSQR(qname="omegle.com", qtype="A"))
 
 send(dns_query)
 
