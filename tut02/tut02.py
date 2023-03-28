@@ -1,81 +1,148 @@
-from scapy.all import *
+import scapy.all as scapy
+import socket
 
-dst_ip = "104.23.141.25"# OMEGLE.COM
-dst_port = 443
-src_port = 9999
-
-syn_pkt = IP(dst=dst_ip) / TCP(dport=dst_port, flags="S")
-syn_ack_pkt = sr1(syn_pkt)
-ack_pkt = IP(dst=dst_ip) / TCP(dport=dst_port, flags="A",
-                               seq=syn_ack_pkt.ack, ack=syn_ack_pkt.seq + 1)
-
-send(ack_pkt)
-wrpcap('./output/TCP_handshake_start_2001CS71.pcap',
-       [syn_pkt, syn_ack_pkt, ack_pkt])
+x = 0
 
 
-syn_packet = IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port, flags="S")
-
-print("sending syn")
-syn_ack_response = sr1(syn_packet)
+def get_ip_address(hostname):
+    return socket.gethostbyname(hostname)
 
 
-ack_packet = IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port, flags="A",
-                                  seq=syn_packet[TCP].seq + 1, ack=syn_ack_response[TCP].seq + 1)
-
-print("sending syn-ack")
-send(ack_packet)
-
-# Create the FIN packet
-fin_packet = IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port,
-                                  flags="FA", seq=ack_packet[TCP].seq, ack=ack_packet[TCP].ack)
-
-print("sending fin")
-send(fin_packet)
-
-fin_ack_response = sr1(fin_packet)
-final_ack_packet = IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port,
-                                     flags="A", seq=fin_ack_response[TCP].ack, ack=fin_ack_response[TCP].seq + 1)
-send(final_ack_packet)
-#ARP REQUEST
+def process_tcp_3_way_handshake_start(packet):
+    print(packet)
+    filename = "./output/TCP_3_Way_Handshake_Start_2001CS71.pcap"
+    scapy.wrpcap(filename, packet, append=True)
 
 
-wrpcap("./output/TCP_handshake_close_2001CS71.pcap",
-       [fin_packet, fin_ack_response, final_ack_packet])
+def tcp_3_way_handshake_start(ip_address, interface):
+    filter = "tcp and host " + ip_address
+    scapy.sniff(iface=interface, store=False, filter=filter,
+                count=3, prn=process_tcp_3_way_handshake_start)
 
-#DNS REQUEST
-dns_query = IP(dst="8.8.8.8")/UDP(sport=RandShort(), dport=53) / \
-    DNS(rd=1, qd=DNSQR(qname="omegle.com", qtype="A"))
 
-send(dns_query)
+def process_tcp_handshake_close(packet):
+    print(packet)
+    filename = "./output/TCP_Handshake_Close_2001CS71.pcap"
+    scapy.wrpcap(filename, packet, append=True)
 
-answer = sr1(dns_query)
 
-wrpcap("./output/DNS_request_response_2001CS71.pcap", [dns_query, answer])
+def tcp_handshake_close(ip_address, interface):
+    filter = "tcp and host " + ip_address + " and tcp[tcpflags] & tcp-fin != 0"
+    scapy.sniff(iface=interface, store=False, filter=filter,
+                count=2, prn=process_tcp_handshake_close)
 
-#PING REQUEST
-ping = IP(dst=dst_ip)/ICMP()
-send(ping)
 
-ping_answer = sr1(ping)
+def process_arp(packet):
+    global x
+    filename = "./output/ARP_2001CS71.pcap"
+    if (x == 0 and packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 1):
+        print(packet)
+        scapy.wrpcap(filename, packet, append=True)
+        x = 1
+    if (x == 1 and packet.haslayer(scapy.ARP) and packet[scapy.ARP].op == 2):
+        print(packet)
+        scapy.wrpcap(filename, packet, append=True)
+        x = 2
 
-wrpcap("./output/PING_request_response_2001CS71.pcap", [ping, ping_answer])
 
-#ARP PACKET BRODCASTING
-arp_send = Ether(dst='ff:ff:ff:ff:ff:ff')/ARP(pdst='172.16.176.1')
+def arp(interface):
+    filter = "arp"
+    scapy.sniff(iface=interface, store=False,
+                filter=filter, count=10, prn=process_arp)
 
-arp_response = srp1(arp_send)
-wrpcap("./output/ARP_request_response_2001CS71.pcap", [arp_send, arp_response])
 
-#FTP CONNECTION 
+def process_arp_request_response(packet):
+    print(packet)
+    filename = "./output/ARP_Request_Response_2001CS71.pcap"
+    scapy.wrpcap(filename, packet, append=True)
 
-ftp_pkt = IP(dst='195.144.107.198')/TCP(sport=20, dport=21, flags="S")
-ftp_res = sr1(ftp_pkt)
 
-wrpcap("./output/FTP_Connection_Start_2001CS71.pcap", [ftp_pkt, ftp_res])
-#FTP CLOSE
-ftp_close = IP(dst='195.144.107.198')/TCP(sport=20, dport=21, seq=ftp_res.ack,
-                                          ack=ftp_res.seq+1, flags="PA")
+def arp_request_response(interface):
+    filter = "arp"
+    scapy.sniff(iface=interface, store=False, filter=filter,
+                count=2, prn=process_arp_request_response)
 
-wrpcap("./output/FTP_Connection_End_2001CS71.pcap", [ftp_close])
-#2001CS71 SIYARAM KUMAR
+
+def process_dns_request_response(packet):
+    global x
+    filename = "./output/DNS_Request_Response_2001CS71.pcap"
+    if (x < 2 and packet.haslayer(scapy.DNSQR) and packet[scapy.DNSQR].qtype == 1 and ("omegle" in str(packet[scapy.DNSQR].qname))):
+        print(packet)
+        scapy.wrpcap(filename, packet, append=True)
+        x = x+1
+
+
+def dns_request_response(ip_address, interface):
+    filter = "port 53"
+    scapy.sniff(iface=interface, store=False, filter=filter,
+                count=20, prn=process_dns_request_response)
+
+
+def process_ping_request_response(packet):
+    print(packet)
+    filename = "./output/PING_Request_Response_2001CS71.pcap"
+    scapy.wrpcap(filename, packet, append=True)
+
+
+def ping_request_response(ip_address, interface):
+    filter = "icmp and host " + ip_address
+    scapy.sniff(iface=interface, store=False, filter=filter,
+                count=2, prn=process_ping_request_response)
+
+
+def process_ftp_connection_start(packet):
+    print(packet)
+    filename = "./output/FTP_Connection_Start_2001CS71.pcap"
+    scapy.wrpcap(filename, packet, append=True)
+
+
+def ftp_connection_start(interface):
+    filter = "port 21"
+    scapy.sniff(iface=interface, store=False, filter=filter,
+                count=3, prn=process_ftp_connection_start)
+
+
+def process_ftp_connection_close(packet):
+    global x
+    if (packet[scapy.TCP].flags.F):
+        print(packet)
+        filename = "./output/FTP_Connection_Close_2001CS71.pcap"
+        scapy.wrpcap(filename, packet, append=True)
+        x -= 1
+
+
+def ftp_connection_close(interface):
+    global x
+    filter = "port 21"
+    while (x):
+        scapy.sniff(iface=interface, store=False, filter=filter,
+                    count=1, prn=process_ftp_connection_close)
+
+
+def sniffer(interface, hostname):
+    global x
+    ip_address = get_ip_address(hostname)
+    print(ip_address)
+#     tcp_3_way_handshake_start(ip_address, interface)
+    # tcp_handshake_close(ip_address, interface)
+    arp(interface)
+    arp_request_response(interface)  # localhost
+
+    x = 0
+
+#     dns_request_response(ip_address, interface)
+    # ping_request_response(ip_address, interface)
+    # interface="\\Device\\NPF_Loopback"
+    # ftp_connection_start(interface)
+    # x=1
+    # ftp_connection_close(interface)
+
+
+def main():
+    hostname = "omegle.com"
+    interface = "Wi-Fi"
+    sniffer(interface, hostname)
+
+
+if __name__ == "__main__":
+    main()
