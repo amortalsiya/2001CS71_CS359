@@ -40,24 +40,24 @@ def calculate(expression):
     try:
         return str(eval(expression))
     except:
-        return "Error"
+        return "Error enter a valid string"
 
-# function for clint connection
+
 
 
 # Lists For Clients and Their Nicknames
 clients = []
 names = []
 
-
+# function for clint connection
 def handle_client(client_socket, client_address):
     print(f'Client {client_address} connected')
 
     # receive data from the client
     while True:
-        data = client_socket.recv(1024).decode()
+        data = client_socket.recv(1024)
         if data:
-            expression = data
+            expression = data.decode()
 
             print(f"Received expression: {expression}")
             # Perform the arithmetic operation
@@ -71,7 +71,7 @@ def handle_client(client_socket, client_address):
             client_socket.close()
             name = names[index]
             names.remove(name)
-            print(f"{name} connection closed!")
+            print(f":{name} connection closed!:")
             break
 
     client_socket.close()

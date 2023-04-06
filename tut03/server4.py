@@ -12,8 +12,8 @@ client_addresses = {} # mappes socket's connection to its address
 def create_socket():
     try:
         global host, port, server
-        host = ""
-        port = int(sys.argv[1])
+        host = sys.argv[1]
+        port = int(sys.argv[2])
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.setblocking(0) # now server won't get blocked
     except socket.error as message:
@@ -117,5 +117,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # for reference - http://pymotw.com/3/select/#:~:text=Python's%20select()%20function%20is,or%20a%20communication%20error%20occurs.
+    
     main()

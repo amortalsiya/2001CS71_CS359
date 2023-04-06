@@ -46,11 +46,17 @@ print(f"Server is listening on port {PORT}")
 while True:
     # Wait for a connection
     client_socket, client_address = server_socket.accept()
+    # name = client_socket.recv(1024).decode()
+    
+    # # Print  name
+    # print(f"Now  {name} is connected")
+
+    # client_socket.send('Connected to server!'.encode('ascii'))
     print(f"Connection from {client_address}")
 
     # Receive the client's input
     while True:
-        data = client_socket.recv(1024) 
+        data = client_socket.recv(1024)
         if data:
             expression = data.decode()
 
@@ -61,5 +67,5 @@ while True:
             client_socket.sendall(result.encode())
         else:
             break
-    print("connection closed!")
+    print(": connection closed!:")
     client_socket.close()
