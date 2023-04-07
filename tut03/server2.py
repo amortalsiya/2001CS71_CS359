@@ -78,7 +78,7 @@ def handle_client(client_socket, client_address):
 
 
 while True:
-    # Wait for a connection
+    # Wait for a connectionXZXZZXX
     client_socket, client_address = server_socket.accept()
     
     # Request And Store name

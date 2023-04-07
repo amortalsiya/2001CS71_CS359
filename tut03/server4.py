@@ -6,7 +6,7 @@ import queue
 inputs = [] # sockets from which we expect to read
 outputs = [] # sockets from which we expect to write
 message_queues = {} # outgoing message queues for each socket
-client_addresses = {} # mappes socket's connection to its address
+client_addresses = {} # mappes socket's connection to its addressXZX
 
 
 def create_socket():

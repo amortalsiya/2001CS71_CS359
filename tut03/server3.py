@@ -6,7 +6,7 @@ import queue
 inputs = [] # sockets from which we expect to read
 outputs = [] # sockets from which we expect to write
 message_queues = {} # outgoing message queues for each socket
-client_addresses = {} # mappes socket's connection to its address
+client_addresses = {} # mappes socket's connection to its addressxzx
 
 
 def create_socket():
@@ -102,7 +102,7 @@ def SELECT():
             try:
                 next_message = message_queues[s].get_nowait()
             except queue.Empty:
-                outputs.remove(s) # so that select() does not indicate that the socket is ready to send data
+                outputs.remove(s) # so that select() xzxzxdoes not indicate that the socket is ready to send data
             else:
                 send_result(s, next_message)
 

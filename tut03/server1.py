@@ -24,7 +24,7 @@ port = int(sys.argv[2])
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
-# Bind the socket to a specific address and port
+# Bind the socket to a specific address and portxzxzzxzxz
 try:
     server_socket.bind((ip_address, port))
     print(f'socket bind to port {port}')
@@ -38,13 +38,13 @@ HOST = ip_address
 PORT = port
 
 
-# Listen for incoming connections
+# Listen for incoming connectionsxxz
 server_socket.listen(1)
 print(f"Server is listening on port {PORT}")
 
 
 while True:
-    # Wait for a connection
+    # Wait for a connectionxxzxx
     client_socket, client_address = server_socket.accept()
     # name = client_socket.recv(1024).decode()
     
@@ -54,7 +54,7 @@ while True:
     # client_socket.send('Connected to server!'.encode('ascii'))
     print(f"Connection from {client_address}")
 
-    # Receive the client's input
+    # Receive the client's inputzxxzx
     while True:
         data = client_socket.recv(1024)
         if data:

@@ -2,23 +2,23 @@
 import socket
 import sys
 
-# Get server IP and port number from command line arguments
+# Get server IP and port number from command line argumentsX
 if len(sys.argv) < 3:
     print('Usage: python server.py <ip address> <port number>')
     sys.exit(1)
 
 # Define the server's IP address and port number
-SERVER_IP = sys.argv[1]  # "127.0.0.1" localhost
+SERVER_IP = sys.argv[1]  # "127.0.0.1" localhosts
 SERVER_PORT = int(sys.argv[2])  # 5000 
 
 
-#FOR SERVER 1 FAKE CLIENT UNCOMMENT &MULTY CLIENT  COMMENT  3 LINE BELOW
+# FOR SERVER 1 FAKE CLIENT UNCOMMENT &MULTY CLIENT  COMMENT  3 LINE BELOW
 # fake_client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # fake_client_socket.connect((SERVER_IP, SERVER_PORT))
 # fake_client_socket.close()
 
 
-# Create a socket object
+# Create a socket objectxx
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 
